@@ -45,10 +45,16 @@ class AutoStripAttributes::Config
       set_filter :convert_non_breaking_spaces => false do |value|
         value.respond_to?(:gsub) ? value.gsub("\u00A0", " ") : value
       end
-      set_filter :strip => true do |value|
+      set_filter :strip => false do |value|
         value.respond_to?(:strip) ? value.strip : value
       end
-      set_filter :nullify => true do |value|
+      set_filter :lstrip => false do |value|
+        value.respond_to?(:lstrip) ? value.lstrip : value
+      end
+      set_filter :rstrip => true do |value|
+        value.respond_to?(:rstrip) ? value.rstrip : value
+      end
+      set_filter :nullify => false do |value|
         # We check for blank? and empty? because rails uses empty? inside blank?
         # e.g. MiniTest::Mock.new() only responds to .blank? but not empty?, check tests for more info
         # Basically same as value.blank? ? nil : value
@@ -59,6 +65,12 @@ class AutoStripAttributes::Config
       end
       set_filter :delete_whitespaces => false do |value|
         value.respond_to?(:delete) ? value.delete(" \t") : value
+      end
+      set_filter :empty_stringify => true do |value|
+        # We check for blank? and empty? because rails uses empty? inside blank?
+        # e.g. MiniTest::Mock.new() only responds to .blank? but not empty?, check tests for more info
+        # Basically same as value.blank? ? nil : value
+        (value.respond_to?(:'blank?') and value.respond_to?(:'empty?') and value.blank?) ? '' : value
       end
     end
 
